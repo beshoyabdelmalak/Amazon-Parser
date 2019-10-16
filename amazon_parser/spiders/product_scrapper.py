@@ -18,7 +18,9 @@ class ProductSpider(scrapy.Spider):
     # limit = 0
 
     for file in os.listdir("product_xml_files"):
-         start_urls.append(
+        if str(file) == ".DS_Store":
+          continue
+        start_urls.append(
              "file://" + os.path.realpath("product_xml_files") + "/" + str(file))  # replace with your local path
 
 
@@ -83,16 +85,6 @@ class ProductSpider(scrapy.Spider):
         product["ratingCount"] = self.getRatingCount(sel)
 
         yield product
-
-        
-        reviews_ratings = self.getReviews(sel)
-        for i in range(len(reviews_ratings[0])):
-          review = Review()
-          review['asin'] = product['asin']
-          review['review'] = reviews_ratings[0][i]
-          review['rating'] = reviews_ratings[1][i]
-          yield review
-
 
 
     @staticmethod
@@ -1204,6 +1196,8 @@ class ProductSpider(scrapy.Spider):
 
 
 
+
+
     def spider_opened(self):
         print("\n\n\nSpider Opened\n\n\n")
 
@@ -1213,13 +1207,4 @@ class ProductSpider(scrapy.Spider):
         crawler.signals.connect(spider.spider_opened, signal=signals.spider_opened)
         return spider
 
-    def getReviews(self, sel):
 
-      reviews = sel.xpath('//span[@class="a-size-base review-text review-text-content"]/span/text()').extract()
-      crawled_ratings = sel.xpath('//*[(@id = "cm_cr-review_list")]//*[contains(concat( " ", @class, " " ), concat( " ", "a-icon-alt", " " ))]/text()').extract()
-      ratings = []
-      for rating in crawled_ratings:
-        rating = float(rating[:rating.find('out of 5 stars') - 1].strip())
-        ratings.append(rating)
-      reviews_rating = [reviews, ratings]
-      return reviews_rating

@@ -39,7 +39,7 @@ class AmazonCrawlerPipeline(object):
         result = es.count(index="laptops",body=query)
         count = result['count']
         if count > 0:
-          e = {"asin": item["asin"], "review": str(item["review"]), "rating": float(item["rating"])}
+          e = {"asin": item["asin"], "review": str(item["review"]), "rating": float(item["rating"]),"title":str(item['title'])}
           es.index(index="reviews",doc_type='review',body= e)
 
 
